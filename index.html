@@ -1,0 +1,670 @@
+import { Play, Plus, Star } from "lucide-react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import heroBanner from "@/assets/hero-banner.jpg";
+
+const HeroSection = () => {
+  return (
+    <section className="relative h-[85vh] min-h-[600px] w-full overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src={heroBanner}
+          alt="Featured movie banner"
+          className="w-full h-full object-cover"
+        />
+        {/* Overlays */}
+        <div className="absolute inset-0 hero-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="relative container mx-auto px-4 md:px-8 h-full flex items-end pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-2xl space-y-5"
+        >
+          <div className="flex items-center gap-3">
+            <span className="px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-md uppercase tracking-wider">
+              Phim Nổi Bật
+            </span>
+            <div className="flex items-center gap-1 text-yellow-400">
+              <Star size={14} fill="currentColor" />
+              <span className="text-sm font-semibold">8.9</span>
+            </div>
+            <span className="text-sm text-muted-foreground">2024</span>
+          </div>
+
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground leading-tight">
+            Chiến Binh <br />
+            <span className="text-gradient">Bóng Đêm</span>
+          </h2>
+
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">
+            Trong một thế giới tương lai u tối, một chiến binh cô độc đứng lên 
+            chống lại thế lực đen tối đang đe dọa nhân loại.
+          </p>
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Hành Động</span>
+            <span>•</span>
+            <span>Khoa Học Viễn Tưởng</span>
+            <span>•</span>
+            <span>2h 28m</span>
+          </div>
+
+          <div className="flex items-center gap-4 pt-2">
+            <Button size="lg" className="gap-2 font-semibold text-base px-8 glow-shadow">
+              <Play size={18} fill="currentColor" />
+              Xem Ngay
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="gap-2 font-semibold text-base px-6 border-muted-foreground/30 text-foreground hover:bg-secondary"
+            >
+              <Plus size={18} />
+              Thêm Vào DS
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default HeroSection;
+import { Star, Play } from "lucide-react";
+import { motion } from "framer-motion";
+import type { Movie } from "@/data/movies";
+
+interface MovieCardProps {
+  movie: Movie;
+  index: number;
+}
+
+const MovieCard = ({ movie, index }: MovieCardProps) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      viewport={{ once: true }}
+      className="group relative flex-shrink-0 w-[180px] md:w-[220px] cursor-pointer"
+    >
+      {/* Poster */}
+      <div className="relative aspect-[2/3] rounded-lg overflow-hidden card-shadow">
+        <img
+          src={movie.poster}
+          alt={movie.title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+        />
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center glow-shadow">
+            <Play size={24} className="text-primary-foreground ml-1" fill="currentColor" />
+          </div>
+        </div>
+        {/* Rating badge */}
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md">
+          <Star size={12} className="text-yellow-400" fill="currentColor" />
+          <span className="text-xs font-semibold text-foreground">{movie.rating}</span>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="mt-3 space-y-1">
+        <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+          {movie.title}
+        </h3>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>{movie.year}</span>
+          <span>•</span>
+          <span>{movie.duration}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default MovieCard;
+import { useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import MovieCard from "./MovieCard";
+import type { Movie } from "@/data/movies";
+
+interface MovieRowProps {
+  title: string;
+  movies: Movie[];
+}
+
+const MovieRow = ({ title, movies }: MovieRowProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const amount = direction === "left" ? -400 : 400;
+      scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <section className="py-6">
+      <div className="container mx-auto px-4 md:px-8">
+        <h2 className="text-xl md:text-2xl font-display font-bold text-foreground mb-4">
+          {title}
+        </h2>
+      </div>
+      <div className="relative group/row">
+        {/* Scroll buttons */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center text-foreground opacity-0 group-hover/row:opacity-100 transition-opacity hover:bg-secondary"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center text-foreground opacity-0 group-hover/row:opacity-100 transition-opacity hover:bg-secondary"
+        >
+          <ChevronRight size={20} />
+        </button>
+
+        {/* Movie list */}
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 md:px-8"
+        >
+          {movies.map((movie, index) => (
+            <MovieCard key={movie.id} movie={movie} index={index} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default MovieRow;
+import { useState, useEffect } from "react";
+import { Search, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const Navbar = () => {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = ["Trang Chủ", "Phim Lẻ", "Phim Bộ", "Thể Loại", "Xếp Hạng"];
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "bg-background/95 backdrop-blur-md shadow-lg" : "bg-gradient-to-b from-background/80 to-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4 md:px-8 flex items-center justify-between h-16">
+        <div className="flex items-center gap-8">
+          <h1 className="text-2xl font-display font-bold text-gradient tracking-tight">
+            PhimHay
+          </h1>
+          <div className="hidden md:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <a
+                key={link}
+                href="#"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <AnimatePresence>
+            {searchOpen && (
+              <motion.input
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 200, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                className="bg-secondary border border-border rounded-md px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                placeholder="Tìm phim..."
+                autoFocus
+              />
+            )}
+          </AnimatePresence>
+          <button
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Search size={20} />
+          </button>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-background/95 backdrop-blur-md border-t border-border"
+          >
+            <div className="px-4 py-4 space-y-3">
+              {navLinks.map((link) => (
+                <a
+                  key={link}
+                  href="#"
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+};
+
+export default Navbar;
+export interface Movie {
+  id: number;
+  title: string;
+  year: number;
+  rating: number;
+  genre: string[];
+  duration: string;
+  description: string;
+  poster: string;
+  backdrop?: string;
+}
+
+const POSTER_BASE = "https://image.tmdb.org/t/p/w500";
+
+export const movies: Movie[] = [
+  {
+    id: 1,
+    title: "Chiến Binh Bóng Đêm",
+    year: 2024,
+    rating: 8.5,
+    genre: ["Hành Động", "Khoa Học Viễn Tưởng"],
+    duration: "2h 28m",
+    description: "Trong một thế giới tương lai u tối, một chiến binh cô độc đứng lên chống lại thế lực đen tối đang đe dọa nhân loại.",
+    poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
+  },
+  {
+    id: 2,
+    title: "Biển Sâu Bí Ẩn",
+    year: 2024,
+    rating: 7.8,
+    genre: ["Phiêu Lưu", "Bí Ẩn"],
+    duration: "2h 05m",
+    description: "Một nhóm thám hiểm dưới đáy đại dương phát hiện ra nền văn minh cổ đại đã mất tích hàng ngàn năm.",
+    poster: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=600&fit=crop",
+  },
+  {
+    id: 3,
+    title: "Ngọn Lửa Tình Yêu",
+    year: 2023,
+    rating: 8.1,
+    genre: ["Tình Cảm", "Tâm Lý"],
+    duration: "1h 52m",
+    description: "Câu chuyện tình yêu đầy cảm xúc giữa hai con người thuộc hai thế giới khác biệt nhưng số phận lại gắn kết họ.",
+    poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&h=600&fit=crop",
+  },
+  {
+    id: 4,
+    title: "Đế Chế Rồng",
+    year: 2024,
+    rating: 8.9,
+    genre: ["Hành Động", "Giả Tưởng"],
+    duration: "2h 45m",
+    description: "Sử thi hoành tráng về cuộc chiến giữa loài người và rồng trong thời đại trung cổ huyền bí.",
+    poster: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&h=600&fit=crop",
+  },
+  {
+    id: 5,
+    title: "Bóng Ma Trong Đêm",
+    year: 2024,
+    rating: 7.5,
+    genre: ["Kinh Dị", "Bí Ẩn"],
+    duration: "1h 48m",
+    description: "Một gia đình chuyển đến ngôi nhà cổ và dần phát hiện ra những bí mật kinh hoàng ẩn giấu trong bóng tối.",
+    poster: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=400&h=600&fit=crop",
+  },
+  {
+    id: 6,
+    title: "Hành Tinh Xanh",
+    year: 2023,
+    rating: 8.3,
+    genre: ["Khoa Học Viễn Tưởng", "Phiêu Lưu"],
+    duration: "2h 15m",
+    description: "Đội thám hiểm không gian tìm thấy hành tinh có sự sống và phải đối mặt với những sinh vật chưa từng biết đến.",
+    poster: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&h=600&fit=crop",
+  },
+  {
+    id: 7,
+    title: "Chiến Tranh Mạng",
+    year: 2024,
+    rating: 7.9,
+    genre: ["Hành Động", "Tội Phạm"],
+    duration: "2h 10m",
+    description: "Một hacker thiên tài bị cuốn vào cuộc chiến mạng toàn cầu khi phát hiện ra âm mưu kiểm soát thế giới.",
+    poster: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=600&fit=crop",
+  },
+  {
+    id: 8,
+    title: "Mùa Hè Năm Ấy",
+    year: 2023,
+    rating: 8.0,
+    genre: ["Tình Cảm", "Gia Đình"],
+    duration: "1h 55m",
+    description: "Câu chuyện cảm động về tình bạn và tuổi trẻ trong một mùa hè đáng nhớ ở vùng quê yên bình.",
+    poster: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&h=600&fit=crop",
+  },
+  {
+    id: 9,
+    title: "Vương Quốc Phép Thuật",
+    year: 2024,
+    rating: 8.6,
+    genre: ["Giả Tưởng", "Hoạt Hình"],
+    duration: "1h 42m",
+    description: "Một cô bé bước vào vương quốc phép thuật và phải hoàn thành sứ mệnh cứu cả hai thế giới.",
+    poster: "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?w=400&h=600&fit=crop",
+  },
+  {
+    id: 10,
+    title: "Đường Đua Tử Thần",
+    year: 2024,
+    rating: 7.7,
+    genre: ["Hành Động", "Thể Thao"],
+    duration: "2h 00m",
+    description: "Tay đua huyền thoại trở lại đường đua trong cuộc thi tốc độ nguy hiểm nhất hành tinh.",
+    poster: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=400&h=600&fit=crop",
+  },
+  {
+    id: 11,
+    title: "Sương Mù Đỏ",
+    year: 2023,
+    rating: 8.2,
+    genre: ["Kinh Dị", "Tâm Lý"],
+    duration: "2h 08m",
+    description: "Một thị trấn nhỏ bị bao phủ bởi làn sương mù đỏ kỳ lạ, và cư dân dần mất kiểm soát bản thân.",
+    poster: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=600&fit=crop",
+  },
+  {
+    id: 12,
+    title: "Ánh Sáng Cuối Đường",
+    year: 2024,
+    rating: 8.4,
+    genre: ["Tâm Lý", "Chính Kịch"],
+    duration: "2h 20m",
+    description: "Hành trình đầy cảm xúc của một người đàn ông tìm lại ý nghĩa cuộc sống sau bi kịch mất mát.",
+    poster: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop",
+  },
+];
+
+export const categories = [
+  { name: "Thịnh Hành", movies: movies.slice(0, 6) },
+  { name: "Phim Hành Động", movies: movies.filter(m => m.genre.includes("Hành Động")) },
+  { name: "Phim Tình Cảm", movies: movies.filter(m => m.genre.includes("Tình Cảm") || m.genre.includes("Tâm Lý")) },
+  { name: "Khoa Học Viễn Tưởng", movies: movies.filter(m => m.genre.includes("Khoa Học Viễn Tưởng") || m.genre.includes("Giả Tưởng")) },
+  { name: "Kinh Dị & Bí Ẩn", movies: movies.filter(m => m.genre.includes("Kinh Dị") || m.genre.includes("Bí Ẩn")) },
+];
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 6%;
+    --foreground: 210 20% 95%;
+
+    --card: 220 18% 10%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 220 18% 10%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 0 85% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 210 20% 90%;
+
+    --muted: 220 15% 14%;
+    --muted-foreground: 215 15% 55%;
+
+    --accent: 0 85% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 0 85% 55%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 220 18% 8%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 0 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 14%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 0 85% 55%;
+
+    /* Custom tokens */
+    --gradient-hero: linear-gradient(to top, hsl(220 20% 6%) 0%, transparent 100%);
+    --gradient-card: linear-gradient(145deg, hsl(220 18% 12%) 0%, hsl(220 18% 8%) 100%);
+    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 20px hsl(0 85% 55% / 0.3);
+  }
+
+  .dark {
+    --background: 220 20% 6%;
+    --foreground: 210 20% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-red-400;
+  }
+
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-border/50;
+  }
+
+  .hero-overlay {
+    background: var(--gradient-hero);
+  }
+
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .glow-shadow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import MovieRow from "@/components/MovieRow";
+import { categories } from "@/data/movies";
+
+const Index = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main>
+        <HeroSection />
+        <div className="relative z-10 -mt-16 space-y-2">
+          {categories.map((category) => (
+            <MovieRow
+              key={category.name}
+              title={category.name}
+              movies={category.movies}
+            />
+          ))}
+        </div>
+        {/* Footer */}
+        <footer className="container mx-auto px-4 md:px-8 py-12 mt-8 border-t border-border">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2024 PhimHay. Mọi quyền được bảo lưu.
+            </p>
+            <div className="flex gap-6 text-sm text-muted-foreground">
+              <a href="#" className="hover:text-foreground transition-colors">Điều khoản</a>
+              <a href="#" className="hover:text-foreground transition-colors">Bảo mật</a>
+              <a href="#" className="hover:text-foreground transition-colors">Liên hệ</a>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+  );
+};
+
+export default Index;
+import type { Config } from "tailwindcss";
+
+export default {
+  darkMode: ["class"],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  prefix: "",
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      fontFamily: {
+        display: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"Be Vietnam Pro"', 'sans-serif'],
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-in": {
+          from: { transform: "translateX(-100%)" },
+          to: { transform: "translateX(0)" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.6s ease-out forwards",
+        "slide-in": "slide-in 0.4s ease-out",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
